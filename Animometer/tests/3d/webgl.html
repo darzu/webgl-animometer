@@ -160,15 +160,33 @@ var b = new WebGLStage;
 b.initialize();
 b.tune(20000);
 var lastTime = 0.0;
+
+var avgFrameTime = 0;
+
+let prev_timeStamp = performance.now();
+
 function cb(timeStamp) {
+  let before_frame = performance.now();
+
   var timeDelta = 0.0;
   if (lastTime != 0.0) {
     timeDelta = timeStamp - lastTime;
   }
   b.animate(timeDelta);
   lastTime = timeStamp;
+
+  let frameTime = timeStamp - prev_timeStamp;
+  prev_timeStamp = timeStamp;
+  avgFrameTime = updateAvg(avgFrameTime, frameTime);
+  window.avgFrameTime = avgFrameTime;
+
   window.requestAnimationFrame(cb);
 }
+
+let avgWeight = 0.05;
+function updateAvg(avg, curr) {
+  return avg ? (1 - avgWeight) * avg + avgWeight * curr : curr;
+};
 
 cb();
     </script>
