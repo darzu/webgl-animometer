@@ -6,6 +6,8 @@
 </head>
 <body>
     <canvas id="stage"></canvas>
+    <div id="gpuTime" style="font-size: 24px; color: white; position: absolute; top: 0; background: black;">??FPS</div>
+    <div id="cpuTime" style="font-size: 24px; color: white; position: absolute; top: 30px; background: black;">??FPS</div>
     <script id="vertex-with-uniforms" type="x-shader/x-glsl">
 attribute vec4 position;
 attribute vec4 color;
@@ -162,8 +164,11 @@ b.tune(20000);
 var lastTime = 0.0;
 
 var avgFrameTime = 0;
+var avgJsTime = 0;
 
 let prev_timeStamp = performance.now();
+let gpuDiv = document.getElementById("gpuTime")
+let cpuDiv = document.getElementById("cpuTime")
 
 function cb(timeStamp) {
   let before_frame = performance.now();
@@ -177,8 +182,11 @@ function cb(timeStamp) {
 
   let frameTime = timeStamp - prev_timeStamp;
   prev_timeStamp = timeStamp;
+  let jsTime = performance.now() - before_frame;
   avgFrameTime = updateAvg(avgFrameTime, frameTime);
-  window.avgFrameTime = avgFrameTime;
+  avgJsTime = updateAvg(avgJsTime, jsTime);
+  gpuDiv.firstChild.nodeValue = `Frame: ${avgFrameTime.toFixed(2)}ms`;
+  cpuDiv.firstChild.nodeValue = `CPU: ${avgJsTime.toFixed(2)}ms`;
 
   window.requestAnimationFrame(cb);
 }
